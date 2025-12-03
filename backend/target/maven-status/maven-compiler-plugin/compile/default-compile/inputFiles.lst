@@ -1,4 +1,12 @@
-/home/tstroganov/curs/backend/src/main/java/com/education/backend/CourseController.java
-/home/tstroganov/curs/backend/src/main/java/com/education/backend/Course.java
-/home/tstroganov/curs/backend/src/main/java/com/education/backend/BackendApplication.java
-/home/tstroganov/curs/backend/src/main/java/com/education/backend/CourseRepository.java
+/Users/r/fin/kursovaya-stroganov/backend/src/main/java/com/education/backend/CourseRepository.java
+/Users/r/fin/kursovaya-stroganov/backend/src/main/java/com/education/backend/UserRepository.java
+/Users/r/fin/kursovaya-stroganov/backend/src/main/java/com/education/backend/SecurityConfig.java
+/Users/r/fin/kursovaya-stroganov/backend/src/main/java/com/education/backend/HashGenerator.java
+/Users/r/fin/kursovaya-stroganov/backend/src/main/java/com/education/backend/CustomUserDetailsService.java
+/Users/r/fin/kursovaya-stroganov/backend/src/main/java/com/education/backend/CourseController.java
+/Users/r/fin/kursovaya-stroganov/backend/src/main/java/com/education/backend/AuthController.java
+/Users/r/fin/kursovaya-stroganov/backend/src/main/java/com/education/backend/User.java
+/Users/r/fin/kursovaya-stroganov/backend/src/main/java/com/education/backend/AuthRequest.java
+/Users/r/fin/kursovaya-stroganov/backend/src/main/java/com/education/backend/UserService.java
+/Users/r/fin/kursovaya-stroganov/backend/src/main/java/com/education/backend/Course.java
+/Users/r/fin/kursovaya-stroganov/backend/src/main/java/com/education/backend/BackendApplication.java

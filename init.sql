@@ -18,12 +18,14 @@ CREATE TABLE IF NOT EXISTS courses (
     author_id BIGINT
 );
 
--- Примечание: Тестовых пользователей нужно создавать через API регистрации,
+-- Создание администратора с заранее захешированным паролем
+-- Пароль 'admin123' захеширован с использованием BCrypt
+INSERT INTO users (username, password, email, role) VALUES
+('admin', '$2b$12$vshIp3Z4Tn6BS7MKcp84Qeap6uidZOrO8lZ/pRDwalhQFab3FO5Iy', 'admin@example.com', 'ADMIN')
+ON CONFLICT (username) DO NOTHING;
+
+-- Примечание: Других тестовых пользователей нужно создавать через API регистрации,
 -- так как BCrypt генерирует уникальные хеши каждый раз.
--- Пример:
--- curl -X POST http://localhost:8080/api/auth/register \
---   -H "Content-Type: application/json" \
---   -d '{"username":"admin","password":"admin123","email":"admin@example.com"}'
 
 -- Вставка примеров данных
 INSERT INTO courses (title, description, category, author_id) VALUES

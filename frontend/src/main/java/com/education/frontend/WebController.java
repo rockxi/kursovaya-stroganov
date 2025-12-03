@@ -71,6 +71,11 @@ public class WebController {
     @GetMapping("/login")
     public String login(Model model, HttpSession session) {
         addUserToModel(model, session);
+        model.addAttribute("error", session.getAttribute("error"));
+        model.addAttribute("success", session.getAttribute("success"));
+        // Clear attributes after they have been added to the model
+        session.removeAttribute("error");
+        session.removeAttribute("success");
         return "login";
     }
     
@@ -102,8 +107,8 @@ public class WebController {
                 // Успешная авторизация - перенаправляем на главную
                 return "redirect:/?loginSuccess=true";
             } else {
-                model.addAttribute("error", "Неверное имя пользователя или пароль");
-                return "login";
+                session.setAttribute("error", "Неверное имя пользователя или пароль");
+                return "redirect:/login";
             }
         } catch (HttpClientErrorException e) {
             // Обработка ошибок 4xx (401, 400 и т.д.)
@@ -115,17 +120,17 @@ public class WebController {
                     String errorMsg = errorResponse.get("message") != null 
                         ? errorResponse.get("message").toString() 
                         : "Неверное имя пользователя или пароль";
-                    model.addAttribute("error", errorMsg);
+                    session.setAttribute("error", errorMsg);
                 } else {
-                    model.addAttribute("error", "Неверное имя пользователя или пароль");
+                    session.setAttribute("error", "Неверное имя пользователя или пароль");
                 }
             } catch (Exception parseException) {
-                model.addAttribute("error", "Неверное имя пользователя или пароль");
+                session.setAttribute("error", "Неверное имя пользователя или пароль");
             }
-            return "login";
+            return "redirect:/login";
         } catch (Exception e) {
-            model.addAttribute("error", "Ошибка подключения к серверу: " + e.getMessage());
-            return "login";
+            session.setAttribute("error", "Ошибка подключения к серверу: " + e.getMessage());
+            return "redirect:/login";
         }
     }
     
@@ -133,6 +138,11 @@ public class WebController {
     @GetMapping("/register")
     public String register(Model model, HttpSession session) {
         addUserToModel(model, session);
+        model.addAttribute("error", session.getAttribute("error"));
+        model.addAttribute("success", session.getAttribute("success"));
+        // Clear attributes after they have been added to the model
+        session.removeAttribute("error");
+        session.removeAttribute("success");
         return "register";
     }
     
@@ -141,7 +151,8 @@ public class WebController {
             @RequestParam String username,
             @RequestParam String email,
             @RequestParam String password,
-            Model model) {
+            Model model,
+            HttpSession session) {
         try {
             // Создаем JSON запрос к backend
             HttpHeaders headers = new HttpHeaders();
@@ -162,8 +173,8 @@ public class WebController {
             
             Map<String, Object> responseBody = response.getBody();
             if (responseBody != null && Boolean.TRUE.equals(responseBody.get("success"))) {
-                model.addAttribute("success", "Регистрация прошла успешно! Теперь вы можете войти.");
-                return "register";
+                session.setAttribute("success", "Регистрация прошла успешно! Теперь вы можете войти.");
+                return "redirect:/login";
             } else {
                 String errorMsg = responseBody != null && responseBody.get("message") != null 
                     ? responseBody.get("message").toString() 
@@ -181,17 +192,18 @@ public class WebController {
                     String errorMsg = errorResponse.get("message") != null 
                         ? errorResponse.get("message").toString() 
                         : "Ошибка регистрации";
-                    model.addAttribute("error", errorMsg);
+                    session.setAttribute("error", errorMsg);
                 } else {
-                    model.addAttribute("error", "Ошибка регистрации");
+                    session.setAttribute("error", "Ошибка регистрации");
                 }
+                return "redirect:/register";
             } catch (Exception parseException) {
-                model.addAttribute("error", "Ошибка регистрации");
+                session.setAttribute("error", "Ошибка регистрации");
+                return "redirect:/register";
             }
-            return "register";
         } catch (Exception e) {
-            model.addAttribute("error", "Ошибка подключения к серверу: " + e.getMessage());
-            return "register";
+            session.setAttribute("error", "Ошибка подключения к серверу: " + e.getMessage());
+            return "redirect:/register";
         }
     }
     
@@ -200,5 +212,74 @@ public class WebController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/";
+    }
+    
+    // Создание курса (только для ADMIN)
+    @GetMapping("/courses/create")
+    public String createCourse(Model model, HttpSession session) {
+        addUserToModel(model, session);
+        String role = (String) session.getAttribute("role");
+        
+        // Проверка прав доступа
+        if (!"ADMIN".equals(role)) {
+            return "redirect:/?error=accessDenied";
+        }
+        
+        return "create-course";
+    }
+    
+    @PostMapping("/courses/create")
+    public String createCourseSubmit(
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam String category,
+            Model model,
+            HttpSession session) {
+        addUserToModel(model, session);
+        String role = (String) session.getAttribute("role");
+        
+        // Проверка прав доступа
+        if (!"ADMIN".equals(role)) {
+            return "redirect:/?error=accessDenied";
+        }
+        
+        try {
+            // Создаем JSON запрос к backend
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            
+            // Получаем ID текущего пользователя для авторства
+            Long authorId = null;
+            try {
+                // В реальном приложении здесь был бы поиск ID пользователя
+                // Пока используем значение null для поля authorId
+            } catch (Exception e) {
+                // ID пользователя не найден, продолжаем без него
+            }
+            
+            Map<String, Object> request = new HashMap<>();
+            request.put("title", title);
+            request.put("description", description);
+            request.put("category", category);
+            request.put("authorId", authorId);
+            
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
+            
+            ResponseEntity<Map> response = restTemplate.postForEntity(
+                backendUrl + "/courses",
+                entity,
+                Map.class
+            );
+            
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return "redirect:/?courseCreated=true";
+            } else {
+                model.addAttribute("error", "Ошибка при создании курса");
+                return "create-course";
+            }
+        } catch (Exception e) {
+            model.addAttribute("error", "Ошибка подключения к серверу: " + e.getMessage());
+            return "create-course";
+        }
     }
 }
