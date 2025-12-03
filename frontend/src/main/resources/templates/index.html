@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Платформа Онлайн Обучения</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Платформа Онлайн Обучения</h1>
+            <div class="user-info" th:if="${loggedIn}">
+                <div class="user-name" th:text="${username}">User</div>
+                <div class="user-email" th:text="${email}">email@example.com</div>
+            </div>
+        </div>
+        <nav>
+            <a href="/">Курсы</a>
+            <a href="/about">Об авторе</a>
+            <a th:if="${!loggedIn}" href="/login">Вход</a>
+            <a th:if="${!loggedIn}" href="/register">Регистрация</a>
+            <a th:if="${loggedIn}" href="/logout">Выход</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="search-container">
+            <form method="get" action="/">
+                <input type="text" name="query" placeholder="Поиск курсов..." th:value="${query}">
+                <button type="submit">Найти</button>
+            </form>
+        </div>
+
+        <div th:if="${error}" class="error">
+            <p th:text="${error}"></p>
+        </div>
+        
+        <div th:if="${param.loginSuccess}" class="success" style="background-color: #d4edda; color: #155724; padding: 1rem; margin-bottom: 1rem; border-radius: 4px; text-align: center;">
+            <p>Вы успешно вошли в систему!</p>
+        </div>
+
+        <div class="courses-container">
+            <h2>Список курсов</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Описание</th>
+                        <th>Категория</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#arrays.isEmpty(courses)}">
+                        <td colspan="4">Курсы не найдены</td>
+                    </tr>
+                    <tr th:each="course : ${courses}">
+                        <td th:text="${course.id}"></td>
+                        <td th:text="${course.title}"></td>
+                        <td th:text="${course.description}"></td>
+                        <td th:text="${course.category}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Платформа Онлайн Обучения</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # 1. Сервис Базы Данных (PostgreSQL)
+  postgres:
+    image: postgres:15-alpine
+    container_name: education_db
+    restart: always
+    environment:
+      POSTGRES_DB: education_platform
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    # ports:
+    #   - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - education_net
+
+  # 2. Backend - Сервис взаимодействия с БД (REST API)
+  backend:
+    build: ./backend  # Предполагается наличие Dockerfile в папке backend
+    container_name: education_backend
+    restart: on-failure
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/education_platform
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      SERVER_PORT: 8080
+    # ports:
+    #   - "8080:8080"
+    networks:
+      - education_net
+
+  # 3. Frontend - Сервис интерфейса (Java Spring MVC)
+  frontend:
+    build: ./frontend # Предполагается наличие Dockerfile в папке frontend
+    container_name: education_frontend
+    restart: on-failure
+    depends_on:
+      - backend
+    environment:
+      BACKEND_API_URL: http://backend:8080/api
+      SERVER_PORT: 8081
+    ports:
+      - "8081:8081" # Порт, доступный пользователю в браузере
+    networks:
+      - education_net
+
+volumes:
+  db_data:
+
+networks:
+  education_net:
+    driver: bridge
