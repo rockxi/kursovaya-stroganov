@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.HttpClientErrorException;
@@ -61,8 +62,8 @@ public class WebController {
     @GetMapping("/about")
     public String about(Model model, HttpSession session) {
         addUserToModel(model, session);
-        model.addAttribute("authorName", "Иванов Иван");
-        model.addAttribute("group", "ДПИ23-1");
+        model.addAttribute("authorName", "Строганов Тимофей");
+        model.addAttribute("group", "ПИ23-2В");
         model.addAttribute("technologies", "Java Spring, PostgreSQL, Docker");
         return "about";
     }
@@ -281,5 +282,112 @@ public class WebController {
             model.addAttribute("error", "Ошибка подключения к серверу: " + e.getMessage());
             return "create-course";
         }
+    }
+    
+    // Управление пользователями (только для ADMIN)
+    @GetMapping("/admin/users")
+    public String userManagement(Model model, HttpSession session) {
+        addUserToModel(model, session);
+        String role = (String) session.getAttribute("role");
+        
+        // Проверка прав доступа
+        if (!"ADMIN".equals(role)) {
+            return "redirect:/?error=accessDenied";
+        }
+        
+        try {
+            // Используем прямой путь к бэкенду без префикса /api
+            String backendUsersUrl = backendUrl.replace("/api", "/admin/users");
+            Object[] users = restTemplate.getForObject(backendUsersUrl, Object[].class);
+            model.addAttribute("users", users);
+        } catch (Exception e) {
+            model.addAttribute("users", new Object[0]);
+            model.addAttribute("error", "Не удалось подключиться к backend: " + e.getMessage());
+        }
+        
+        return "user-management";
+    }
+    
+    // Редактирование пользователя (только для ADMIN)
+    @GetMapping("/admin/users/{id}")
+    public String editUser(@PathVariable Long id, Model model, HttpSession session) {
+        addUserToModel(model, session);
+        String role = (String) session.getAttribute("role");
+        
+        // Проверка прав доступа
+        if (!"ADMIN".equals(role)) {
+            return "redirect:/?error=accessDenied";
+        }
+        
+        try {
+            String backendUserUrl = backendUrl.replace("/api", "/admin/users/" + id);
+            Object user = restTemplate.getForObject(backendUserUrl, Object.class);
+            model.addAttribute("user", user);
+        } catch (Exception e) {
+            return "redirect:/admin/users?error=userNotFound";
+        }
+        
+        return "edit-user";
+    }
+    
+    // Обновление пользователя (только для ADMIN)
+    @PostMapping("/admin/users/{id}")
+    public String updateUser(
+            @PathVariable Long id,
+            @RequestParam String username,
+            @RequestParam String email,
+            @RequestParam String role,
+            Model model,
+            HttpSession session) {
+        addUserToModel(model, session);
+        String userRole = (String) session.getAttribute("role");
+        
+        // Проверка прав доступа
+        if (!"ADMIN".equals(userRole)) {
+            return "redirect:/?error=accessDenied";
+        }
+        
+        try {
+            // Создаем JSON запрос к backend
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            
+            Map<String, Object> request = new HashMap<>();
+            request.put("username", username);
+            request.put("email", email);
+            request.put("role", role);
+            
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
+            
+            restTemplate.put(
+                backendUrl.replace("/api", "/admin/users/" + id),
+                entity,
+                Map.class
+            );
+            
+            return "redirect:/admin/users?success=userUpdated";
+        } catch (Exception e) {
+            model.addAttribute("error", "Ошибка при обновлении пользователя: " + e.getMessage());
+            return "edit-user";
+        }
+    }
+    
+    // Удаление пользователя (только для ADMIN)
+    @GetMapping("/admin/users/{id}/delete")
+    public String deleteUser(@PathVariable Long id, HttpSession session) {
+        String role = (String) session.getAttribute("role");
+        
+        // Проверка прав доступа
+        if (!"ADMIN".equals(role)) {
+            return "redirect:/?error=accessDenied";
+        }
+        
+        try {
+            restTemplate.delete(backendUrl.replace("/api", "/admin/users/" + id + "/delete"));
+        } catch (Exception e) {
+            return "redirect:/admin/users?error=cannotDeleteUser";
+        }
+        
+        return "redirect:/admin/users?success=userDeleted";
     }
 }

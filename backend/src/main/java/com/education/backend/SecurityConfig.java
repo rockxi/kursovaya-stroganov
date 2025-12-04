@@ -25,6 +25,11 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll() // Разрешаем доступ к регистрации и логину
                 .requestMatchers("/api/courses/**").permitAll() // Разрешаем доступ к курсам
+                .requestMatchers("/admin/users").hasRole("ADMIN") // Только для администраторов
+                .requestMatchers("/admin/users/**").hasRole("ADMIN") // Только для администраторов
+                .requestMatchers("/login", "/register", "/about", "/css/**", "/js/**").permitAll() // Разрешаем доступ к базовым страницам
+                .requestMatchers("/", "/courses/create").authenticated() // Требует аутентификации
+                .requestMatchers("/logout").authenticated() // Для выхода нужна аутентификация
                 .anyRequest().authenticated()
             )
             .httpBasic(basic -> {}); // Используем HTTP Basic Authentication

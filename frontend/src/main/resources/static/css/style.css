@@ -92,6 +92,7 @@ nav a {
   transition: transform .15s ease, box-shadow .2s ease, color .2s ease, border-color .2s ease;
 }
 nav a:hover { transform: translateY(-2px); box-shadow: 0 0 18px rgba(0,255,136,.55), 0 0 32px rgba(0,255,136,.2); border-color: var(--neon); color: #eafff3; }
+nav a.active { background: linear-gradient(180deg, rgba(0,255,136,.15), rgba(0,0,0,.45)); border-color: var(--neon); color: #eafff3; box-shadow: 0 0 15px rgba(0,255,136,.4), 0 0 28px rgba(0,255,136,.15); }
 
 /* Panels */
 .courses-container, .about-container, .login-container, .form-container {
@@ -225,6 +226,54 @@ footer {
 }
 
 h1 { animation: glowPulse 4s ease-in-out infinite; }
+
+/* Buttons for user management */
+.btn-edit {
+  padding: 0.4rem 0.8rem;
+  margin-right: 0.5rem;
+  color: var(--text);
+  background: linear-gradient(180deg, rgba(0,230,118,.15), rgba(0,0,0,.45));
+  border: 1px solid rgba(0,230,118,.35);
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.8rem;
+  box-shadow: var(--shadow);
+  transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+  display: inline-block;
+}
+
+.btn-edit:hover {
+  transform: translateY(-2px);
+  border-color: var(--neon-2);
+  color: #eafff3;
+  box-shadow: 0 0 18px rgba(0,230,118,.55), 0 0 36px rgba(0,230,118,.25);
+}
+
+.btn-delete {
+  padding: 0.4rem 0.8rem;
+  color: var(--text);
+  background: linear-gradient(180deg, rgba(255,77,77,.15), rgba(0,0,0,.45));
+  border: 1px solid rgba(255,77,77,.35);
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.8rem;
+  box-shadow: var(--shadow);
+  transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+  display: inline-block;
+}
+
+.btn-delete:hover {
+  transform: translateY(-2px);
+  border-color: var(--danger);
+  color: #ffffff;
+  box-shadow: 0 0 18px rgba(255,77,77,.55), 0 0 36px rgba(255,77,77,.25);
+}
+
+.no-delete {
+  color: var(--text-dim);
+  font-style: italic;
+  font-size: 0.8rem;
+}
 
 /* Utility */
 .hidden { display: none !important; }

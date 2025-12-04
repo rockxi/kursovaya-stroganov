@@ -16,10 +16,11 @@
             </div>
         </div>
         <nav>
-            <a href="/">Курсы</a>
+            <a href="/" class="active">Курсы</a>
             <a href="/about">Об авторе</a>
             <a th:if="${!loggedIn}" href="/login">Вход</a>
             <a th:if="${!loggedIn}" href="/register">Регистрация</a>
+            <a th:if="${role == 'ADMIN'}" href="/admin/users">Управление пользователями</a>
             <a th:if="${loggedIn}" href="/logout">Выход</a>
         </nav>
     </header>

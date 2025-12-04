@@ -1,15 +1,10 @@
 #!/bin/bash
 
-echo "=== Тест регистрации и авторизации ==="
-echo ""
-
-# Тест 1: Регистрация нового пользователя
 echo "1. Регистрация нового пользователя (testuser3)..."
 REGISTER_RESPONSE=$(docker exec education_backend wget -q -O- --post-data='{"username":"testuser3","password":"test123","email":"testuser3@example.com"}' \
   --header='Content-Type: application/json' \
-  http://localhost:8080/api/auth/register)
+  http://localhost:8080/api/auth/register | jq)
 echo "Ответ: $REGISTER_RESPONSE"
-echo ""
 
 # Тест 2: Попытка зарегистрировать пользователя с тем же именем (должна быть ошибка)
 echo "2. Попытка повторной регистрации (должна быть ошибка)..."
