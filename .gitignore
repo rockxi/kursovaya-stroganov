@@ -1,1 +1,10 @@
+# Maven/Gradle build outputs
+backend/target/
+frontend/target/
 
+# JAR and WAR files
+*.jar
+*.war
+
+# Class files
+*.class
