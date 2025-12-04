@@ -296,8 +296,8 @@ public class WebController {
         }
         
         try {
-            // Используем прямой путь к бэкенду без префикса /api
-            String backendUsersUrl = backendUrl.replace("/api", "/admin/users");
+            // Используем API endpoint для получения пользователей
+            String backendUsersUrl = backendUrl + "/admin/users";
             Object[] users = restTemplate.getForObject(backendUsersUrl, Object[].class);
             model.addAttribute("users", users);
         } catch (Exception e) {
@@ -320,7 +320,7 @@ public class WebController {
         }
         
         try {
-            String backendUserUrl = backendUrl.replace("/api", "/admin/users/" + id);
+            String backendUserUrl = backendUrl + "/admin/users/" + id;
             Object user = restTemplate.getForObject(backendUserUrl, Object.class);
             model.addAttribute("user", user);
         } catch (Exception e) {
@@ -360,7 +360,7 @@ public class WebController {
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
             
             restTemplate.put(
-                backendUrl.replace("/api", "/admin/users/" + id),
+                backendUrl + "/admin/users/" + id,
                 entity,
                 Map.class
             );
@@ -383,7 +383,7 @@ public class WebController {
         }
         
         try {
-            restTemplate.delete(backendUrl.replace("/api", "/admin/users/" + id + "/delete"));
+            restTemplate.delete(backendUrl + "/admin/users/" + id);
         } catch (Exception e) {
             return "redirect:/admin/users?error=cannotDeleteUser";
         }

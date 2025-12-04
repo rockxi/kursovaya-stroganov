@@ -25,6 +25,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll() // Разрешаем доступ к регистрации и логину
                 .requestMatchers("/api/courses/**").permitAll() // Разрешаем доступ к курсам
+                .requestMatchers("/api/admin/users/**").permitAll() // Разрешаем доступ к API управления пользователями
                 .requestMatchers("/admin/users").hasRole("ADMIN") // Только для администраторов
                 .requestMatchers("/admin/users/**").hasRole("ADMIN") // Только для администраторов
                 .requestMatchers("/login", "/register", "/about", "/css/**", "/js/**").permitAll() // Разрешаем доступ к базовым страницам
