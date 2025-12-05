@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Платформа Онлайн Обучения</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v=2)}">
 </head>
 <body>
     <header>
@@ -25,56 +25,59 @@
         </nav>
     </header>
 
-    <main>
-        <div class="search-container">
-            <form method="get" action="/">
-                <input type="text" name="query" placeholder="Поиск курсов..." th:value="${query}">
-                <button type="submit">Найти</button>
-            </form>
-        </div>
-
-        <div th:if="${error}" class="error">
-            <p th:text="${error}"></p>
-        </div>
-        
-        <div th:if="${param.loginSuccess}" class="success" style="background-color: #d4edda; color: #155724; padding: 1rem; margin-bottom: 1rem; border-radius: 4px; text-align: center;">
-            <p>Вы успешно вошли в систему!</p>
-        </div>
-        
-        <div th:if="${param.courseCreated}" class="success" style="background-color: #d4edda; color: #155724; padding: 1rem; margin-bottom: 1rem; border-radius: 4px; text-align: center;">
-            <p>Курс успешно создан!</p>
-        </div>
-        
-        <div th:if="${param.error == 'accessDenied'}" class="error" style="background-color: #f8d7da; color: #721c24; padding: 1rem; margin-bottom: 1rem; border-radius: 4px; text-align: center;">
-            <p>Доступ запрещен. Только администраторы могут создавать курсы.</p>
-        </div>
-
-        <div class="courses-container">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <main class="main-layout">
+        <aside class="courses-sidebar">
+            <div class="sidebar-header">
                 <h2>Список курсов</h2>
-                <a th:if="${role == 'ADMIN'}" href="/courses/create" class="btn-create" style="background-color: #28a745; color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px; font-weight: bold;">+ Создать курс</a>
+                <a th:if="${role == 'ADMIN'}" href="/courses/create" class="btn-create-small" title="Создать курс">+</a>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Название</th>
-                        <th>Описание</th>
-                        <th>Категория</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:if="${#arrays.isEmpty(courses)}">
-                        <td colspan="4">Курсы не найдены</td>
-                    </tr>
-                    <tr th:each="course : ${courses}">
-                        <td th:text="${course.id}"></td>
-                        <td th:text="${course.title}"></td>
-                        <td th:text="${course.description}"></td>
-                        <td th:text="${course.category}"></td>
-                    </tr>
-                </tbody>
-            </table>
+            
+            <div class="search-container-sidebar">
+                <form method="get" action="/">
+                    <input type="text" name="query" placeholder="Поиск..." th:value="${query}">
+                    <button type="submit">🔍</button>
+                </form>
+            </div>
+            
+            <div class="courses-list">
+                <div th:if="${#arrays.isEmpty(courses)}" class="empty-message">
+                    <p>Курсы не найдены</p>
+                </div>
+                <div th:each="course : ${courses}" class="course-card">
+                    <div class="course-title" th:text="${course.title}"></div>
+                    <div class="course-category" th:text="${course.category}"></div>
+                    <div class="course-description" th:text="${course.description}"></div>
+                </div>
+            </div>
+        </aside>
+        
+        <div class="main-content">
+            <div class="welcome-panel">
+                <h2>Добро пожаловать в платформу онлайн обучения!</h2>
+                <p>Выберите курс из списка слева для получения подробной информации.</p>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${#arrays.length(courses)}">0</div>
+                        <div class="stat-label">Всего курсов</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${error}" class="error">
+                <p th:text="${error}"></p>
+            </div>
+            
+            <div th:if="${param.loginSuccess}" class="success">
+                <p>Вы успешно вошли в систему!</p>
+            </div>
+            
+            <div th:if="${param.courseCreated}" class="success">
+                <p>Курс успешно создан!</p>
+            </div>
+            
+            <div th:if="${param.error == 'accessDenied'}" class="error">
+                <p>Доступ запрещен. Только администраторы могут создавать курсы.</p>
+            </div>
         </div>
     </main>
 
