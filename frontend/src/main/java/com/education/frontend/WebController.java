@@ -51,11 +51,43 @@ public class WebController {
             // Запрос JSON данных с бэкенда
             Object[] courses = restTemplate.getForObject(url, Object[].class);
             model.addAttribute("courses", courses);
+            model.addAttribute("query", query);
         } catch (Exception e) {
             model.addAttribute("courses", new Object[0]);
             model.addAttribute("error", "Не удалось подключиться к backend");
         }
         return "index"; // Возвращает index.html
+    }
+    
+    // Просмотр курса (детальная информация)
+    @GetMapping("/courses/{id}")
+    public String viewCourse(@PathVariable Long id, Model model, @RequestParam(required = false) String query, HttpSession session) {
+        addUserToModel(model, session);
+        
+        // Получаем все курсы для сайдбара
+        String coursesUrl = backendUrl + "/courses";
+        if (query != null) {
+            coursesUrl += "?search=" + query;
+        }
+        
+        try {
+            Object[] courses = restTemplate.getForObject(coursesUrl, Object[].class);
+            model.addAttribute("courses", courses);
+            model.addAttribute("query", query);
+        } catch (Exception e) {
+            model.addAttribute("courses", new Object[0]);
+        }
+        
+        // Получаем детали выбранного курса
+        try {
+            Object course = restTemplate.getForObject(backendUrl + "/courses/" + id, Object.class);
+            model.addAttribute("selectedCourse", course);
+            model.addAttribute("selectedCourseId", id);
+        } catch (Exception e) {
+            model.addAttribute("error", "Курс не найден");
+        }
+        
+        return "index";
     }
 
     // Страница "Об авторе" (Обязательное требование п. 1.9)
@@ -233,7 +265,9 @@ public class WebController {
     public String createCourseSubmit(
             @RequestParam String title,
             @RequestParam String description,
+            @RequestParam String detailedDescription,
             @RequestParam String category,
+            @RequestParam String curriculum,
             Model model,
             HttpSession session) {
         addUserToModel(model, session);
@@ -258,10 +292,15 @@ public class WebController {
                 // ID пользователя не найден, продолжаем без него
             }
             
+            // Преобразуем куррикулум из многострочного текста в формат с разделителем |
+            String formattedCurriculum = curriculum.trim().replaceAll("\\r?\\n", "|");
+            
             Map<String, Object> request = new HashMap<>();
             request.put("title", title);
             request.put("description", description);
+            request.put("detailedDescription", detailedDescription);
             request.put("category", category);
+            request.put("curriculum", formattedCurriculum);
             request.put("authorId", authorId);
             
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
@@ -284,7 +323,7 @@ public class WebController {
         }
     }
     
-    // Управление пользователями (только для ADMIN)
+    // Управление (только для ADMIN)
     @GetMapping("/admin/users")
     public String userManagement(Model model, HttpSession session) {
         addUserToModel(model, session);

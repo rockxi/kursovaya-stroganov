@@ -20,7 +20,7 @@
             <a href="/about">Об авторе</a>
             <a th:if="${!loggedIn}" href="/login">Вход</a>
             <a th:if="${!loggedIn}" href="/register">Регистрация</a>
-            <a th:if="${role == 'ADMIN'}" href="/admin/users">Управление пользователями</a>
+            <a th:if="${role == 'ADMIN'}" href="/admin/users">Управление</a>
             <a th:if="${loggedIn}" href="/logout">Выход</a>
         </nav>
     </header>
@@ -43,16 +43,20 @@
                 <div th:if="${#arrays.isEmpty(courses)}" class="empty-message">
                     <p>Курсы не найдены</p>
                 </div>
-                <div th:each="course : ${courses}" class="course-card">
+                <a th:each="course : ${courses}" 
+                   th:href="@{/courses/{id}(id=${course.id}, query=${query})}"
+                   class="course-card" 
+                   th:classappend="${selectedCourseId != null && selectedCourseId == course.id} ? 'selected' : ''">
                     <div class="course-title" th:text="${course.title}"></div>
                     <div class="course-category" th:text="${course.category}"></div>
                     <div class="course-description" th:text="${course.description}"></div>
-                </div>
+                </a>
             </div>
         </aside>
         
         <div class="main-content">
-            <div class="welcome-panel">
+            <!-- Welcome panel - show when no course selected -->
+            <div class="welcome-panel" th:if="${selectedCourse == null}">
                 <h2>Добро пожаловать в платформу онлайн обучения!</h2>
                 <p>Выберите курс из списка слева для получения подробной информации.</p>
                 <div class="stats">
@@ -60,6 +64,30 @@
                         <div class="stat-number" th:text="${#arrays.length(courses)}">0</div>
                         <div class="stat-label">Всего курсов</div>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Course detail view - show when course selected -->
+            <div class="course-detail" th:if="${selectedCourse != null}">
+                <div class="course-detail-header">
+                    <h2 class="course-detail-title" th:text="${selectedCourse.title}"></h2>
+                    <span class="course-detail-category" th:text="${selectedCourse.category}"></span>
+                </div>
+                
+                <div class="course-detail-section">
+                    <h3>О курсе</h3>
+                    <p class="course-detail-description" th:text="${selectedCourse.detailedDescription}"></p>
+                </div>
+                
+                <div class="course-detail-section" th:if="${selectedCourse.curriculum != null && !#strings.isEmpty(selectedCourse.curriculum)}">
+                    <h3>Программа курса</h3>
+                    <ul class="curriculum-list">
+                        <li th:each="item : ${#strings.arraySplit(selectedCourse.curriculum, '|')}" th:text="${item}"></li>
+                    </ul>
+                </div>
+                
+                <div class="course-detail-actions">
+                    <a href="/" class="btn-secondary">Вернуться к списку курсов</a>
                 </div>
             </div>
             
@@ -80,9 +108,5 @@
             </div>
         </div>
     </main>
-
-    <footer>
-        <p>&copy; 2025 Платформа Онлайн Обучения</p>
-    </footer>
 </body>
 </html>

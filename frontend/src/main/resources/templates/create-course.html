@@ -20,7 +20,7 @@
             <a href="/about">Об авторе</a>
             <a th:if="${!loggedIn}" href="/login">Вход</a>
             <a th:if="${!loggedIn}" href="/register">Регистрация</a>
-            <a th:if="${role == 'ADMIN'}" href="/admin/users">Управление пользователями</a>
+            <a th:if="${role == 'ADMIN'}" href="/admin/users">Управление</a>
             <a th:if="${loggedIn}" href="/logout">Выход</a>
         </nav>
     </header>
@@ -40,13 +40,26 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="description">Описание:</label>
-                    <textarea id="description" name="description" required rows="5"></textarea>
+                    <label for="description">Краткое описание:</label>
+                    <textarea id="description" name="description" required rows="3" placeholder="Краткое описание курса для списка"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="detailedDescription">Подробное описание:</label>
+                    <textarea id="detailedDescription" name="detailedDescription" required rows="6" placeholder="Подробное описание курса, его целей и преимуществ"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="category">Категория:</label>
                     <input type="text" id="category" name="category" required maxlength="100">
+                </div>
+                
+                <div class="form-group">
+                    <label for="curriculum">Программа курса (каждая тема с новой строки):</label>
+                    <textarea id="curriculum" name="curriculum" required rows="8" placeholder="Например:
+Основы синтаксиса
+Переменные и типы данных
+Объектно-ориентированное программирование"></textarea>
                 </div>
 
                 <div class="form-actions">
@@ -56,9 +69,5 @@
             </form>
         </div>
     </main>
-
-    <footer>
-        <p>&copy; 2025 Платформа Онлайн Обучения</p>
-    </footer>
 </body>
 </html>

@@ -16,4 +16,10 @@ public class Course {
     
     @Column(name = "author_id")
     private Long authorId;
+    
+    @Column(name = "detailed_description", columnDefinition = "TEXT")
+    private String detailedDescription;
+    
+    @Column(name = "curriculum", columnDefinition = "TEXT")
+    private String curriculum;
 }

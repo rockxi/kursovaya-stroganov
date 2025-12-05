@@ -21,6 +21,12 @@ public class CourseController {
         }
         return repository.findAll();
     }
+    
+    // Получение одного курса по ID
+    @GetMapping("/{id}")
+    public Course getCourseById(@PathVariable Long id) {
+        return repository.findById(id).orElse(null);
+    }
 
     // CRUD операции (требование п. 1.4)
     @PostMapping

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Управление пользователями</title>
+    <title>Управление</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
@@ -18,7 +18,7 @@
         <nav>
             <a href="/">Курсы</a>
             <a href="/about">Об авторе</a>
-            <a th:if="${role == 'ADMIN'}" href="/admin/users" class="active">Управление пользователями</a>
+            <a th:if="${role == 'ADMIN'}" href="/admin/users" class="active">Управление</a>
             <a th:if="${role == 'ADMIN'}" href="/courses/create">Создать курс</a>
             <a href="/logout">Выход</a>
         </nav>
@@ -42,7 +42,7 @@
         </div>
 
         <div class="search-container">
-            <h2>Управление пользователями</h2>
+            <h2>Управление</h2>
             <form method="get" action="/admin/users">
                 <input type="text" name="query" placeholder="Поиск по имени или email..." th:value="${query}">
                 <button type="submit">Найти</button>
@@ -81,9 +81,5 @@
             </table>
         </div>
     </main>
-
-    <footer>
-        <p>&copy; 2025 Платформа Онлайн Обучения</p>
-    </footer>
 </body>
 </html>

@@ -18,7 +18,7 @@
         <nav>
             <a href="/">Курсы</a>
             <a href="/about">Об авторе</a>
-            <a th:if="${role == 'ADMIN'}" href="/admin/users">Управление пользователями</a>
+            <a th:if="${role == 'ADMIN'}" href="/admin/users">Управление</a>
             <a th:if="${role == 'ADMIN'}" href="/courses/create">Создать курс</a>
             <a href="/logout">Выход</a>
         </nav>
@@ -71,9 +71,5 @@
             </form>
         </div>
     </main>
-
-    <footer>
-        <p>&copy; 2025 Платформа Онлайн Обучения</p>
-    </footer>
 </body>
 </html>
