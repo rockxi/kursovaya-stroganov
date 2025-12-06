@@ -17,7 +17,7 @@ public class CourseController {
     @GetMapping
     public List<Course> getAllCourses(@RequestParam(required = false) String search) {
         if (search != null && !search.isEmpty()) {
-            return repository.findByTitleContainingIgnoreCase(search);
+            return repository.searchCourses(search);
         }
         return repository.findAll();
     }

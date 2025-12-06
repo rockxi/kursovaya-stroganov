@@ -173,73 +173,61 @@ docker exec education_db psql -U postgres -d education_platform -c "DELETE FROM 
 
 ### API Testing
 
-**Authentication**
+By default the backend API on port 8080 is NOT exposed to the host. Use one of the following:
+
+A) From inside a container (recommended)
+- Replace curl host with `backend:8080` and run via the frontend container.
 
 Register user:
 ```bash
-curl -X POST http://localhost:8080/api/auth/register \
+docker exec education_frontend curl -s -X POST http://backend:8080/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username":"newuser","password":"password123","email":"newuser@example.com"}'
 ```
 
 Login:
 ```bash
-curl -X POST http://localhost:8080/api/auth/login \
+docker exec education_frontend curl -s -X POST http://backend:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"newuser","password":"password123"}'
 ```
 
-**Courses**
-
-Get all courses:
+Courses (JSON):
 ```bash
-curl http://localhost:8080/api/courses
+docker exec education_frontend curl -s http://backend:8080/api/courses
 ```
 
-Search courses:
+Search courses (URL-encoded query):
 ```bash
-curl "http://localhost:8080/api/courses?search=Java"
+docker exec education_frontend curl -s --get \
+  --data-urlencode "search=Программирование" \
+  http://backend:8080/api/courses
 ```
 
 Create course:
 ```bash
-curl -X POST http://localhost:8080/api/courses \
+docker exec education_frontend curl -s -X POST http://backend:8080/api/courses \
   -H "Content-Type: application/json" \
   -d '{"title":"New Course","description":"Course description","category":"Programming","authorId":null}'
 ```
 
 Delete course:
 ```bash
-curl -X DELETE http://localhost:8080/api/courses/1
+docker exec education_frontend curl -s -X DELETE http://backend:8080/api/courses/1
 ```
 
-**User Management (Admin)**
-
-Get all users:
+Admin users:
 ```bash
-curl http://localhost:8080/api/admin/users
+docker exec education_frontend curl -s http://backend:8080/api/admin/users
 ```
 
-Search users:
-```bash
-curl "http://localhost:8080/api/admin/users?query=admin"
-```
+B) Expose backend to host (optional)
+- Edit docker-compose to map `8080:8080` for the backend service, then use `http://localhost:8080/api/...` from the host.
 
-Get user by ID:
+C) Through the web UI (HTML responses)
+- Use the frontend search page that proxies to the backend and renders HTML:
 ```bash
-curl http://localhost:8080/api/admin/users/1
-```
-
-Update user:
-```bash
-curl -X PUT http://localhost:8080/api/admin/users/1 \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","email":"admin@example.com","role":"ADMIN"}'
-```
-
-Delete user:
-```bash
-curl -X DELETE http://localhost:8080/api/admin/users/2
+curl -s "http://localhost:8081/?query=Java"
 ```
 
 ## Configuration
@@ -359,18 +347,21 @@ File: `docker-compose.yaml`
 2. Access web UI at http://localhost:8081
 3. Login with default admin (admin/admin123) or register new user
 4. Admin can create courses and manage users via web UI
-5. API endpoints available at http://localhost:8080/api (from within containers)
+5. Backend API is reachable as `http://backend:8080/api` from containers. It is not exposed to the host unless you map `8080:8080`.
 6. View logs: `docker-compose logs -f backend frontend`
 7. Database accessible via `docker exec -it education_db psql`
 
 ### Troubleshooting
-- **Backend connection error**: Check if backend container is running and healthy
-- **Database connection error**: Verify PostgreSQL is running and credentials match
-- **Authentication fails**: Ensure password was hashed via BCrypt (use API registration)
-- **ADMIN role not working**: Check user role in database, update via SQL if needed
-- **Port conflicts**: Ensure ports 8080 and 8081 are available on host (only 8081 is exposed)
-- **Container won't start**: Check logs with `docker-compose logs backend` or `docker-compose logs postgres`
-- **Init SQL not running**: Delete volume `docker volume rm kursovaya-stroganov_db_data` and restart
+- curl exit code 7 to http://localhost:8080/...: backend port 8080 is not exposed to host. Use `docker exec education_frontend curl http://backend:8080/...` or expose the port in docker-compose.
+- 404 from http://localhost:8081/api/...: frontend serves HTML pages only; it does not expose backend JSON API. Use the web UI (`/`) or call the backend from a container.
+- 400 Bad Request when searching with non-ASCII text: URL-encode query parameters. With curl use `--get --data-urlencode "search=Программирование"`.
+- Backend connection error: Check if backend container is running and healthy.
+- Database connection error: Verify PostgreSQL is running and credentials match.
+- Authentication fails: Ensure password was hashed via BCrypt (use API registration).
+- ADMIN role not working: Check user role in database, update via SQL if needed.
+- Port conflicts: Ensure port 8081 is free on host (8080 is internal unless you expose it).
+- Container won't start: Check logs with `docker-compose logs backend` or `docker-compose logs postgres`.
+- Init SQL not running: Delete volume `docker volume rm kursovaya-stroganov_db_data` and restart.
 
 ### Frontend-Backend Communication
 - Frontend uses Spring `RestTemplate` for HTTP requests
