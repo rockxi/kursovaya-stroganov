@@ -718,5 +718,15 @@ main:not(.main-layout) {
   text-decoration: none;
 }
 
+.admin-actions {
+  margin-bottom: 1rem;
+}
+
+.admin-actions .btn-primary {
+  width: auto;
+  padding: .85rem 1.8rem;
+  text-decoration: none;
+}
+
 /* Utility */
 .hidden { display: none !important; }

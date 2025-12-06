@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование курса</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Платформа Онлайн Обучения</h1>
+            <div class="user-info" th:if="${loggedIn}">
+                <div class="user-name" th:text="${username}">User</div>
+                <div class="user-email" th:text="${email}">email@example.com</div>
+            </div>
+        </div>
+        <nav>
+            <a href="/">Курсы</a>
+            <a href="/about">Об авторе</a>
+            <a th:if="${!loggedIn}" href="/login">Вход</a>
+            <a th:if="${!loggedIn}" href="/register">Регистрация</a>
+            <a th:if="${role == 'ADMIN'}" href="/admin/users">Управление</a>
+            <a th:if="${loggedIn}" href="/logout">Выход</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="form-container">
+            <h2>Редактирование курса</h2>
+            
+            <div th:if="${error}" class="error">
+                <p th:text="${error}"></p>
+            </div>
+            
+            <div th:if="${param.courseUpdated}" class="success">
+                <p>Курс успешно обновлен!</p>
+            </div>
+
+            <form method="post" th:action="@{'/courses/' + ${courseId} + '/edit'}">
+                <div class="form-group">
+                    <label for="title">Название курса:</label>
+                    <input type="text" id="title" name="title" required maxlength="200" 
+                           th:value="${course != null ? course.title : ''}">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Краткое описание:</label>
+                    <textarea id="description" name="description" required rows="3" 
+                              placeholder="Краткое описание курса для списка"
+                              th:text="${course != null ? course.description : ''}"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="detailedDescription">Подробное описание:</label>
+                    <textarea id="detailedDescription" name="detailedDescription" required rows="6" 
+                              placeholder="Подробное описание курса, его целей и преимуществ"
+                              th:text="${course != null ? course.detailedDescription : ''}"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Категория:</label>
+                    <input type="text" id="category" name="category" required maxlength="100" 
+                           th:value="${course != null ? course.category : ''}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="curriculum">Программа курса (каждая тема с новой строки):</label>
+                    <textarea id="curriculum" name="curriculum" required rows="8" 
+                              placeholder="Например:&#10;Основы синтаксиса&#10;Переменные и типы данных&#10;Объектно-ориентированное программирование"
+                              th:text="${course != null ? (#strings.isEmpty(course.curriculum) ? '' : #strings.replace(course.curriculum, '|', '&#10;')) : ''}"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Сохранить изменения</button>
+                    <a th:href="@{'/courses/' + ${courseId}}" class="btn-secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

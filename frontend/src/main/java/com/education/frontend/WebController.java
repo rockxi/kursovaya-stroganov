@@ -429,4 +429,80 @@ public class WebController {
         
         return "redirect:/admin/users?success=userDeleted";
     }
+    
+    // Редактирование курса (только для ADMIN)
+    @GetMapping("/courses/{id}/edit")
+    public String editCourse(@PathVariable Long id, Model model, HttpSession session) {
+        addUserToModel(model, session);
+        String role = (String) session.getAttribute("role");
+        
+        // Проверка прав доступа
+        if (!"ADMIN".equals(role)) {
+            return "redirect:/?error=accessDenied";
+        }
+        
+        try {
+            // Получаем информацию о курсе
+            Object course = restTemplate.getForObject(backendUrl + "/courses/" + id, Object.class);
+            model.addAttribute("course", course);
+            model.addAttribute("courseId", id);
+        } catch (Exception e) {
+            return "redirect:/?error=courseNotFound";
+        }
+        
+        // Передаем сообщение об ошибке из сессии, если есть
+        model.addAttribute("error", session.getAttribute("error"));
+        session.removeAttribute("error");
+        
+        return "edit-course";
+    }
+    
+    // Обновление курса (только для ADMIN)
+    @PostMapping("/courses/{id}/edit")
+    public String updateCourse(
+            @PathVariable Long id,
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam String detailedDescription,
+            @RequestParam String category,
+            @RequestParam String curriculum,
+            Model model,
+            HttpSession session) {
+        addUserToModel(model, session);
+        String role = (String) session.getAttribute("role");
+        
+        // Проверка прав доступа
+        if (!"ADMIN".equals(role)) {
+            return "redirect:/?error=accessDenied";
+        }
+        
+        try {
+            // Создаем JSON запрос к backend
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            
+            // Преобразуем куррикулум из многострочного текста в формат с разделителем |
+            String formattedCurriculum = curriculum.trim().replaceAll("\\r?\\n", "|");
+            
+            Map<String, Object> request = new HashMap<>();
+            request.put("title", title);
+            request.put("description", description);
+            request.put("detailedDescription", detailedDescription);
+            request.put("category", category);
+            request.put("curriculum", formattedCurriculum);
+            
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
+            
+            restTemplate.put(
+                backendUrl + "/courses/" + id,
+                entity,
+                Map.class
+            );
+            
+            return "redirect:/courses/" + id + "?courseUpdated=true";
+        } catch (Exception e) {
+            session.setAttribute("error", "Ошибка при обновлении курса: " + e.getMessage());
+            return "redirect:/courses/" + id + "/edit";
+        }
+    }
 }
