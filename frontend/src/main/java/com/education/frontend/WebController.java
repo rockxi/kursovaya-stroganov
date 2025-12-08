@@ -63,6 +63,15 @@ public class WebController {
     @GetMapping("/courses/{id}")
     public String viewCourse(@PathVariable Long id, Model model, @RequestParam(required = false) String query, HttpSession session) {
         addUserToModel(model, session);
+        String username = (String) session.getAttribute("username");
+        
+        // Проверяем, авторизован ли пользователь. Если нет - перенаправляем на страницу входа
+        if (username == null) {
+            // Сохраняем ID курса, чтобы после авторизации вернуться к его просмотру
+            session.setAttribute("requestedCourseId", id);
+            session.setAttribute("error", "Для просмотра подробной информации о курсе необходимо войти в систему или зарегистрироваться");
+            return "redirect:/login";
+        }
         
         // Получаем все курсы для сайдбара
         String coursesUrl = backendUrl + "/courses";
@@ -84,7 +93,15 @@ public class WebController {
             model.addAttribute("selectedCourse", course);
             model.addAttribute("selectedCourseId", id);
         } catch (Exception e) {
-            model.addAttribute("error", "Курс не найден");
+            // Проверяем, это ошибка аутентификации или курс не найден
+            if (e.getMessage() != null && e.getMessage().contains("403")) {
+                // Ошибка аутентификации - перенаправляем на страницу входа
+                session.setAttribute("requestedCourseId", id);
+                session.setAttribute("error", "Для просмотра подробной информации о курсе необходимо войти в систему или зарегистрироваться");
+                return "redirect:/login";
+            } else {
+                model.addAttribute("error", "Курс не найден");
+            }
         }
         
         return "index";
@@ -137,6 +154,15 @@ public class WebController {
                 session.setAttribute("username", responseBody.get("username"));
                 session.setAttribute("email", responseBody.get("email"));
                 session.setAttribute("role", responseBody.get("role"));
+                
+                // Проверяем, запросил ли пользователь определенный курс до авторизации
+                Long requestedCourseId = (Long) session.getAttribute("requestedCourseId");
+                if (requestedCourseId != null) {
+                    // Удаляем ID курса из сессии и перенаправляем на страницу курса
+                    session.removeAttribute("requestedCourseId");
+                    return "redirect:/courses/" + requestedCourseId;
+                }
+                
                 // Успешная авторизация - перенаправляем на главную
                 return "redirect:/?loginSuccess=true";
             } else {
@@ -206,8 +232,15 @@ public class WebController {
             
             Map<String, Object> responseBody = response.getBody();
             if (responseBody != null && Boolean.TRUE.equals(responseBody.get("success"))) {
-                session.setAttribute("success", "Регистрация прошла успешно! Теперь вы можете войти.");
-                return "redirect:/login";
+                // Проверяем, запрашивал ли пользователь определенный курс до регистрации
+                Long requestedCourseId = (Long) session.getAttribute("requestedCourseId");
+                if (requestedCourseId != null) {
+                    session.setAttribute("success", "Регистрация прошла успешно! Теперь вы можете войти, чтобы просмотреть курс.");
+                } else {
+                    session.setAttribute("success", "Регистрация прошла успешно! Теперь вы можете войти.");
+                }
+            // Не удаляем requestedCourseId, чтобы пользователь мог попасть на курс после входа
+            return "redirect:/login";
             } else {
                 String errorMsg = responseBody != null && responseBody.get("message") != null 
                     ? responseBody.get("message").toString() 

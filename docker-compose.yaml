@@ -2,7 +2,7 @@
 services:
   # 1. Сервис Базы Данных (PostgreSQL)
   postgres:
-    image: postgres:15-alpine
+    build: ./postgres
     container_name: education_db
     restart: always
     environment:
@@ -13,7 +13,6 @@ services:
     #   - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - education_net
 

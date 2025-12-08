@@ -1,3 +1,6 @@
+-- Инициализация базы данных для платформы онлайн обучения
+
+-- Создание таблицы пользователей
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
@@ -6,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR(50) NOT NULL DEFAULT 'USER'
 );
 
+-- Создание таблицы курсов (если не существует)
 CREATE TABLE IF NOT EXISTS courses (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -16,9 +20,16 @@ CREATE TABLE IF NOT EXISTS courses (
     curriculum TEXT
 );
 
+-- Создание администратора с заранее захешированным паролем
+-- Пароль 'admin123' захеширован с использованием BCrypt
 INSERT INTO users (username, password, email, role) VALUES
 ('admin', '$2b$12$vshIp3Z4Tn6BS7MKcp84Qeap6uidZOrO8lZ/pRDwalhQFab3FO5Iy', 'admin@example.com', 'ADMIN')
 ON CONFLICT (username) DO NOTHING;
+
+-- Примечание: Других тестовых пользователей нужно создавать через API регистрации,
+-- так как BCrypt генерирует уникальные хеши каждый раз.
+
+-- Вставка примеров данных
 INSERT INTO courses (title, description, category, author_id, detailed_description, curriculum) VALUES
 (
     'Java для начинающих',
