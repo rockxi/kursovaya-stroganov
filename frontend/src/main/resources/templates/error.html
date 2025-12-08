@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -207,15 +207,33 @@
 </head>
 <body>
     <div class="error-container">
-        <div class="error-code">500</div>
-        <h1 class="error-title">Ошибка сервера</h1>
-        <p class="error-message">
+        <div class="error-code" th:text="${code != null ? code : '500'}">500</div>
+        <h1 class="error-title" th:text="${title != null ? title : 'Ошибка сервера'}">Ошибка сервера</h1>
+        <p class="error-message" th:text="${message != null ? message : 'Произошла внутренняя ошибка сервера. Пожалуйста, попробуйте позже.'}">
             Произошла внутренняя ошибка сервера. Пожалуйста, попробуйте позже.
         </p>
 
+        <div class="error-details" th:if="${url != null or exception != null}">
+            <h3>Технические детали:</h3>
+            <p th:if="${url != null}"><strong>URL:</strong> <span th:text="${url}"></span></p>
+            <p th:if="${exception != null}"><strong>Исключение:</strong> <span th:text="${exception}"></span></p>
+        </div>
+
         <div class="suggestions">
             <h3>Что можно сделать:</h3>
-            <ul>
+            <ul th:if="${code == 404}">
+                <li>Проверить правильность введенного URL-адреса</li>
+                <li>Вернуться на главную страницу</li>
+                <li>Использовать поиск по сайту</li>
+                <li>Проверить закладки или ссылки, которые вы использовали</li>
+            </ul>
+            <ul th:if="${code == 403}">
+                <li>Убедитесь, что вы вошли в систему</li>
+                <li>Проверьте свои права доступа</li>
+                <li>Связаться с администратором для получения доступа</li>
+                <li>Вернуться на главную страницу</li>
+            </ul>
+            <ul th:if="${code != 404 and code != 403}">
                 <li>Обновить страницу через несколько минут</li>
                 <li>Проверить правильность введенного адреса</li>
                 <li>Вернуться на главную страницу</li>

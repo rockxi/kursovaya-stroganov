@@ -129,11 +129,6 @@ public class WebController {
         return "index";
     }
 
-    @GetMapping("/error")
-    public String error(Model model, HttpSession session) {
-        addUserToModel(model, session);
-        return "error";
-    }
 
     @GetMapping("/about")
     public String about(Model model, HttpSession session) {
