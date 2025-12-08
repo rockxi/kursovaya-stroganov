@@ -142,6 +142,10 @@ public class WebController {
             "deploy_technologies",
             "Docker для развёртывания, Nginx как прокси, Letsencrypt и Certbot для SSL"
         );
+        model.addAttribute(
+            "github_link",
+            "https://github.com/rockxi/kursovaya-stroganov"
+        );
         return "about";
     }
 
