@@ -145,7 +145,7 @@ public class WebController {
         );
         model.addAttribute(
             "github_link",
-            "https://github.com/rockxi/kursovaya_stroganov"
+            "https://github.com/rockxi/kursovaya-stroganov"
         );
         model.addAttribute("tg_link", "https://t.me/rockxi");
         return "about";
