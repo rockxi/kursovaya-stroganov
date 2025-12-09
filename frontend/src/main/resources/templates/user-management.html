@@ -21,7 +21,9 @@
                 <a th:if="${role == 'ADMIN'}" href="/admin/users" class="active"
                     >Управление</a
                 >
-                <a th:if="${role == 'ADMIN'}" href="/courses/create"
+                <a
+                    th:if="${role == 'ADMIN' || role == 'TEACHER'}"
+                    href="/courses/create"
                     >Создать курс</a
                 >
                 <a href="/logout">Выход</a>
@@ -80,7 +82,6 @@
                             <td th:text="${user.role}"></td>
                             <td>
                                 <a
-                                    th:if="${user.username != username}"
                                     th:href="@{/admin/users/{id}(id=${user.id})}"
                                     class="btn-edit"
                                     >Редактировать</a

@@ -1,118 +1,175 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Платформа Онлайн Обучения</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v=2)}">
-</head>
-<body>
-    <header>
-        <div class="header-content">
-            <h1>Платформа Онлайн Обучения</h1>
-            <div class="user-info" th:if="${loggedIn}">
-                <div class="user-name" th:text="${username}">User</div>
-                <div class="user-email" th:text="${email}">email@example.com</div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Платформа Онлайн Обучения</title>
+        <link rel="stylesheet" th:href="@{/css/style.css(v=2)}" />
+    </head>
+    <body>
+        <header>
+            <div class="header-content">
+                <h1>Платформа Онлайн Обучения</h1>
+                <div class="user-info" th:if="${loggedIn}">
+                    <div class="user-name" th:text="${username}">User</div>
+                    <div class="user-email" th:text="${email}">
+                        email@example.com
+                    </div>
+                </div>
             </div>
-        </div>
-        <nav>
-            <a href="/" class="active">Курсы</a>
-            <a href="/about">Об авторе</a>
-            <a th:if="${!loggedIn}" href="/login">Вход</a>
-            <a th:if="${!loggedIn}" href="/register">Регистрация</a>
-            <a th:if="${role == 'ADMIN'}" href="/admin/users">Управление</a>
-            <a th:if="${loggedIn}" href="/logout">Выход</a>
-        </nav>
-    </header>
+            <nav>
+                <a href="/" class="active">Курсы</a>
+                <a href="/about">Об авторе</a>
+                <a th:if="${!loggedIn}" href="/login">Вход</a>
+                <a th:if="${!loggedIn}" href="/register">Регистрация</a>
+                <a th:if="${role == 'ADMIN'}" href="/admin/users">Управление</a>
+                <a th:if="${loggedIn}" href="/logout">Выход</a>
+            </nav>
+        </header>
 
-    <main class="main-layout">
-        <aside class="courses-sidebar">
-            <div class="sidebar-header">
-                <h2>Список курсов</h2>
-                <a th:if="${role == 'ADMIN'}" href="/courses/create" class="btn-create-small" title="Создать курс">+</a>
-            </div>
-            
-            <div class="search-container-sidebar">
-                <form method="get" action="/">
-                    <input type="text" name="query" placeholder="Поиск..." th:value="${query}">
-                    <button type="submit">🔍</button>
-                </form>
-            </div>
-            
-            <div class="courses-list">
-                <div th:if="${#arrays.isEmpty(courses)}" class="empty-message">
-                    <p>Курсы не найдены</p>
+        <main class="main-layout">
+            <aside class="courses-sidebar">
+                <div class="sidebar-header">
+                    <h2>Список курсов</h2>
+                    <a
+                        th:if="${role == 'ADMIN' || role == 'TEACHER'}"
+                        href="/courses/create"
+                        class="btn-create-small"
+                        title="Создать курс"
+                        >+</a
+                    >
                 </div>
-                <a th:each="course : ${courses}" 
-                   th:href="@{/courses/{id}(id=${course.id}, query=${query})}"
-                   class="course-card" 
-                   th:classappend="${selectedCourseId != null && selectedCourseId == course.id} ? 'selected' : ''">
-                    <div class="course-title" th:text="${course.title}"></div>
-                    <div class="course-category" th:text="${course.category}"></div>
-                    <div class="course-description" th:text="${course.description}"></div>
-                </a>
-            </div>
-        </aside>
-        
-        <div class="main-content">
-            <!-- Welcome panel - show when no course selected -->
-            <div class="welcome-panel" th:if="${selectedCourse == null}">
-                <h2>Добро пожаловать в платформу онлайн обучения!</h2>
-                <p>Войдите в систему для получения подробной информации.</p>
-                <div class="stats">
-                    <div class="stat-item">
-                        <div class="stat-number" th:text="${#arrays.length(courses)}">0</div>
-                        <div class="stat-label">Всего курсов</div>
+
+                <div class="search-container-sidebar">
+                    <form method="get" action="/">
+                        <input
+                            type="text"
+                            name="query"
+                            placeholder="Поиск..."
+                            th:value="${query}"
+                        />
+                        <button type="submit">🔍</button>
+                    </form>
+                </div>
+
+                <div class="courses-list">
+                    <div
+                        th:if="${#arrays.isEmpty(courses)}"
+                        class="empty-message"
+                    >
+                        <p>Курсы не найдены</p>
+                    </div>
+                    <a
+                        th:each="course : ${courses}"
+                        th:href="@{/courses/{id}(id=${course.id}, query=${query})}"
+                        class="course-card"
+                        th:classappend="${selectedCourseId != null && selectedCourseId == course.id} ? 'selected' : ''"
+                    >
+                        <div
+                            class="course-title"
+                            th:text="${course.title}"
+                        ></div>
+                        <div
+                            class="course-category"
+                            th:text="${course.category}"
+                        ></div>
+                        <div
+                            class="course-description"
+                            th:text="${course.description}"
+                        ></div>
+                    </a>
+                </div>
+            </aside>
+
+            <div class="main-content">
+                <!-- Welcome panel - show when no course selected -->
+                <div class="welcome-panel" th:if="${selectedCourse == null}">
+                    <h2>Добро пожаловать в платформу онлайн обучения!</h2>
+                    <p>Войдите в систему для получения подробной информации.</p>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div
+                                class="stat-number"
+                                th:text="${#arrays.length(courses)}"
+                            >
+                                0
+                            </div>
+                            <div class="stat-label">Всего курсов</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Course detail view - show when course selected -->
-            <div class="course-detail" th:if="${selectedCourse != null}">
-                <div class="course-detail-header">
-                    <h2 class="course-detail-title" th:text="${selectedCourse.title}"></h2>
-                    <span class="course-detail-category" th:text="${selectedCourse.category}"></span>
-                </div>
-                
-                <div class="course-detail-section">
-                    <h3>О курсе</h3>
-                    <p class="course-detail-description" th:text="${selectedCourse.detailedDescription}"></p>
-                </div>
-                
-                <div class="course-detail-section" th:if="${selectedCourse.curriculum != null && !#strings.isEmpty(selectedCourse.curriculum)}">
-                    <h3>Программа курса</h3>
-                    <ul class="curriculum-list">
-                        <li th:each="item : ${#strings.arraySplit(selectedCourse.curriculum, '|')}" th:text="${item}"></li>
-                    </ul>
-                </div>
-                
-                <div class="course-detail-actions">
-                    <div th:if="${role == 'ADMIN'}" class="admin-actions">
-                        <a th:href="@{'/courses/' + ${selectedCourseId} + '/edit'}" class="btn-primary">Редактировать курс</a>
+
+                <!-- Course detail view - show when course selected -->
+                <div class="course-detail" th:if="${selectedCourse != null}">
+                    <div class="course-detail-header">
+                        <h2
+                            class="course-detail-title"
+                            th:text="${selectedCourse.title}"
+                        ></h2>
+                        <span
+                            class="course-detail-category"
+                            th:text="${selectedCourse.category}"
+                        ></span>
+                    </div>
+
+                    <div class="course-detail-section">
+                        <h3>О курсе</h3>
+                        <p
+                            class="course-detail-description"
+                            th:text="${selectedCourse.detailedDescription}"
+                        ></p>
+                    </div>
+
+                    <div
+                        class="course-detail-section"
+                        th:if="${selectedCourse.curriculum != null && !#strings.isEmpty(selectedCourse.curriculum)}"
+                    >
+                        <h3>Программа курса</h3>
+                        <ul class="curriculum-list">
+                            <li
+                                th:each="item : ${#strings.arraySplit(selectedCourse.curriculum, '|')}"
+                                th:text="${item}"
+                            ></li>
+                        </ul>
+                    </div>
+
+                    <div class="course-detail-actions">
+                        <div
+                            th:if="${role == 'ADMIN' || role == 'TEACHER'}"
+                            class="admin-actions"
+                        >
+                            <a
+                                th:href="@{'/courses/' + ${selectedCourseId} + '/edit'}"
+                                class="btn-primary"
+                                >Редактировать курс</a
+                            >
+                        </div>
                     </div>
                 </div>
+
+                <div th:if="${error}" class="error">
+                    <p th:text="${error}"></p>
+                </div>
+
+                <div th:if="${param.loginSuccess}" class="success">
+                    <p>Вы успешно вошли в систему!</p>
+                </div>
+
+                <div th:if="${param.courseCreated}" class="success">
+                    <p>Курс успешно создан!</p>
+                </div>
+
+                <div th:if="${param.courseUpdated}" class="success">
+                    <p>Курс успешно обновлен!</p>
+                </div>
+
+                <div th:if="${param.error == 'accessDenied'}" class="error">
+                    <p>
+                        Доступ запрещен. Только администраторы могут создавать
+                        курсы.
+                    </p>
+                </div>
             </div>
-            
-            <div th:if="${error}" class="error">
-                <p th:text="${error}"></p>
-            </div>
-            
-            <div th:if="${param.loginSuccess}" class="success">
-                <p>Вы успешно вошли в систему!</p>
-            </div>
-            
-            <div th:if="${param.courseCreated}" class="success">
-                <p>Курс успешно создан!</p>
-            </div>
-            
-            <div th:if="${param.courseUpdated}" class="success">
-                <p>Курс успешно обновлен!</p>
-            </div>
-            
-            <div th:if="${param.error == 'accessDenied'}" class="error">
-                <p>Доступ запрещен. Только администраторы могут создавать курсы.</p>
-            </div>
-        </div>
-    </main>
-</body>
+        </main>
+    </body>
 </html>

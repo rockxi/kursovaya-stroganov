@@ -385,7 +385,7 @@ public class WebController {
         String role = (String) session.getAttribute("role");
 
         // Проверка прав доступа
-        if (!"ADMIN".equals(role)) {
+        if (!"ADMIN".equals(role) && !"TEACHER".equals(role)) {
             return "redirect:/?error=accessDenied";
         }
 
