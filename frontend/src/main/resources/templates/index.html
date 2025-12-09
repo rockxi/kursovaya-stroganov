@@ -143,6 +143,12 @@
                                 class="btn-primary"
                                 >Редактировать курс</a
                             >
+                            <a
+                                th:href="@{'/courses/' + ${selectedCourseId} + '/delete'}"
+                                class="btn-primary"
+                                onclick="return confirm('Вы уверены, что хотите удалить этот курс?');"
+                                >Удалить курс</a
+                            >
                         </div>
                     </div>
                 </div>
@@ -161,6 +167,10 @@
 
                 <div th:if="${param.courseUpdated}" class="success">
                     <p>Курс успешно обновлен!</p>
+                </div>
+
+                <div th:if="${param.courseDeleted}" class="success">
+                    <p>Курс успешно удалён!</p>
                 </div>
 
                 <div th:if="${param.error == 'accessDenied'}" class="error">

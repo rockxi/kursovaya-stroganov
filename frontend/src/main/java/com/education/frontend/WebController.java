@@ -364,7 +364,7 @@ public class WebController {
         String role = (String) session.getAttribute("role");
 
         // Проверка прав доступа
-        if (!"ADMIN".equals(role)) {
+        if (!"ADMIN".equals(role) && !"TEACHER".equals(role)) {
             return "redirect:/?error=accessDenied";
         }
 
@@ -569,7 +569,7 @@ public class WebController {
         return "redirect:/admin/users?success=userDeleted";
     }
 
-    // Редактирование курса (только для ADMIN)
+    // Редактирование курса (только для ADMIN и TEACHER)
     @GetMapping("/courses/{id}/edit")
     public String editCourse(
         @PathVariable Long id,
@@ -580,7 +580,7 @@ public class WebController {
         String role = (String) session.getAttribute("role");
 
         // Проверка прав доступа
-        if (!"ADMIN".equals(role)) {
+        if (!"ADMIN".equals(role) && !"TEACHER".equals(role)) {
             return "redirect:/?error=accessDenied";
         }
 
@@ -619,7 +619,7 @@ public class WebController {
         String role = (String) session.getAttribute("role");
 
         // Проверка прав доступа
-        if (!"ADMIN".equals(role)) {
+        if (!"ADMIN".equals(role) && !"TEACHER".equals(role)) {
             return "redirect:/?error=accessDenied";
         }
 
@@ -655,5 +655,24 @@ public class WebController {
             );
             return "redirect:/courses/" + id + "/edit";
         }
+    }
+
+    // Удаление курса (только для ADMIN и TEACHER)
+    @GetMapping("/courses/{id}/delete")
+    public String deleteCourse(@PathVariable Long id, HttpSession session) {
+        String role = (String) session.getAttribute("role");
+
+        // Проверка прав доступа
+        if (!"ADMIN".equals(role) && !"TEACHER".equals(role)) {
+            return "redirect:/?error=accessDenied";
+        }
+
+        try {
+            restTemplate.delete(backendUrl + "/courses/" + id);
+        } catch (Exception e) {
+            return "redirect:/courses/" + id + "?error=cannotDeleteCourse";
+        }
+
+        return "redirect:/?courseDeleted=true";
     }
 }
