@@ -1,16 +1,15 @@
 package com.education.backend;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*") // Разрешаем CORS для frontend
+@CrossOrigin(origins = "*")
 public class AuthController {
 
     @Autowired
@@ -24,18 +23,18 @@ public class AuthController {
                 request.getPassword(),
                 request.getEmail()
             );
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "User registered successfully");
             response.put("username", user.getUsername());
-            
+
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", e.getMessage());
-            
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
@@ -46,24 +45,26 @@ public class AuthController {
             request.getUsername(),
             request.getPassword()
         );
-        
+
         Map<String, Object> response = new HashMap<>();
-        
+
         if (authenticated) {
             User user = userService.findByUsername(request.getUsername());
             response.put("success", true);
             response.put("message", "Login successful");
             response.put("username", user.getUsername());
-            response.put("email", user.getEmail()); // Добавлено поле email
+            response.put("email", user.getEmail());
             response.put("email", user.getEmail());
             response.put("role", user.getRole());
-            
+
             return ResponseEntity.ok(response);
         } else {
             response.put("success", false);
             response.put("message", "Invalid username or password");
-            
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                response
+            );
         }
     }
 }
